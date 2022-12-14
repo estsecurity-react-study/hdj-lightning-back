@@ -22,9 +22,15 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Todo
+- [ ] 로그인 (Passport)
+  - [ ] 로컬
+  - [ ] 카카오
+  - [ ] 네이버
+  - [ ] 구글
+- [ ] CRUD
+  - [ ] 검색
+- [ ] 채팅
 
 ## Installation
 
