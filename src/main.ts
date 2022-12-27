@@ -5,7 +5,8 @@ import { SwaggerModule } from '@nestjs/swagger/dist';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
@@ -14,6 +15,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();

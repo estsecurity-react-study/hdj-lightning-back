@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsString } from 'class-validator';
 import {
   Column,
   Entity,
@@ -9,8 +9,16 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  DeleteDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+
+export enum Provider {
+  LOCAL = 'local',
+  GOOGLE = 'google',
+  NAVER = 'naver',
+  KAKAO = 'kakao',
+}
 
 @Entity()
 @Unique(['email'])
@@ -25,6 +33,11 @@ export class User {
   @Column()
   @IsString()
   username: string;
+
+  @Column()
+  @IsEnum(Provider)
+  @Exclude()
+  provider: Provider;
 
   @Column()
   @IsString()
@@ -43,4 +56,8 @@ export class User {
 
   @UpdateDateColumn()
   updateAt: Date;
+
+  @DeleteDateColumn()
+  @Exclude()
+  deleteAt: Date | null;
 }
