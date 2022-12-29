@@ -9,10 +9,14 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtTokenPayload } from './interface/token.interface';
+import { Profile } from 'passport-google-oauth20';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -36,6 +40,17 @@ export class AuthService {
     }
   }
 
+  setJwtTokenCookie(res: Response, token: string) {
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      maxAge: this.configService.get('JWT_MAX_AGE'),
+    });
+  }
+
+  removeTokens(res: Response) {
+    res.cookie('jwt', '', { httpOnly: true, maxAge: 0 });
+  }
+
   login(user: User) {
     const payload: JwtTokenPayload = {
       id: user.id,
@@ -48,5 +63,23 @@ export class AuthService {
     return {
       token,
     };
+  }
+
+  loginGoogle(profile: Profile) {
+    if (!profile) {
+      throw new NotFoundException();
+    }
+
+    if (!profile.emails[0].verified) {
+      throw new UnauthorizedException('not verified email.');
+    }
+
+    // const payload = {
+    //   email: user.emails[0].value,
+    //   username: `${user.name.givenName}${user.name.familyName}`,
+    //   provider: user.provider,
+    // };
+
+    return;
   }
 }

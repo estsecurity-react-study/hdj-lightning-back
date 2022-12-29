@@ -46,8 +46,10 @@ export class AuthController {
     @Req() req: PassportLocalRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
-    res.cookie('jwt', req.user, { httpOnly: true, maxAge: 1000 * 60 * 60 });
-    return req.user;
+    const token = req.user;
+
+    this.authService.setJwtTokenCookie(res, token);
+    return token;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -56,7 +58,7 @@ export class AuthController {
     @Req() req: PassportJwtRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
-    if (req.user) res.cookie('jwt', '', { httpOnly: true, maxAge: 0 });
+    if (req.user) this.authService.removeTokens(res);
     return null;
   }
 
@@ -95,7 +97,7 @@ export class AuthController {
     };
 
     const token = this.jwtService.sign(payload);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 1000 * 60 * 60 });
+    this.authService.setJwtTokenCookie(res, token);
 
     const url = this.configService.get('FRONTEND_URL');
     res.redirect(url);
