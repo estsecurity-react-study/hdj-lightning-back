@@ -81,6 +81,7 @@ export class AuthController {
       throw new NotFoundException();
     }
 
+    // TODO: 소셜 로그인 이여도 DB에 유저 가공해서 저장.
     const user = req.user;
 
     if (!user.emails[0].verified) {
@@ -95,8 +96,8 @@ export class AuthController {
 
     const token = this.jwtService.sign(payload);
     res.cookie('jwt', token, { httpOnly: true, maxAge: 1000 * 60 * 60 });
+
     const url = this.configService.get('FRONTEND_URL');
-    console.log('redirect!', url);
     res.redirect(url);
   }
 }
