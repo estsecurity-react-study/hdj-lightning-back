@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common/exceptions/not-found.exception';
 import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import {
@@ -19,6 +20,7 @@ import {
 import { CreateUserDto } from 'src/user/dtos/createUser.dto';
 import { Provider } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -26,8 +28,10 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(
+    private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   @Post('/register')
@@ -42,12 +46,22 @@ export class AuthController {
     @Req() req: PassportLocalRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
+    res.cookie('jwt', req.user, { httpOnly: true, maxAge: 1000 * 60 * 60 });
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('/logout')
+  logout(
+    @Req() req: PassportJwtRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    if (req.user) res.cookie('jwt', '', { httpOnly: true, maxAge: 0 });
+    return null;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/me')
-  profile(@Req() req) {
   profile(@Req() req: PassportJwtRequest) {
     console.log('jwt authorized!', req.user);
     return req.user;
@@ -80,7 +94,9 @@ export class AuthController {
     };
 
     const token = this.jwtService.sign(payload);
-
-    res.redirect(`http://localhost:3001/login/?token=${token}`);
+    res.cookie('jwt', token, { httpOnly: true, maxAge: 1000 * 60 * 60 });
+    const url = this.configService.get('FRONTEND_URL');
+    console.log('redirect!', url);
+    res.redirect(url);
   }
 }
