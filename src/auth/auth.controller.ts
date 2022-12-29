@@ -11,8 +11,11 @@ import { NotFoundException } from '@nestjs/common/exceptions/not-found.exception
 import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import { Profile } from 'passport-google-oauth20';
-import { PassportRequest } from 'src/@types/passport-request.type';
+import {
+  PassportGoogleRequest,
+  PassportJwtRequest,
+  PassportLocalRequest,
+} from 'src/auth/interface/passport-request.interface';
 import { CreateUserDto } from 'src/user/dtos/createUser.dto';
 import { Provider } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -35,13 +38,17 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  login(@Req() req) {
+  login(
+    @Req() req: PassportLocalRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   profile(@Req() req) {
+  profile(@Req() req: PassportJwtRequest) {
     console.log('jwt authorized!', req.user);
     return req.user;
   }
@@ -54,10 +61,7 @@ export class AuthController {
 
   @UseGuards(GoogleAuthGuard)
   @Get('/google/callback')
-  googleAuthCallback(
-    @Req() req: PassportRequest<Profile>,
-    @Res() res: Response,
-  ) {
+  googleAuthCallback(@Req() req: PassportGoogleRequest, @Res() res: Response) {
     console.log('passport data\n', req.user);
     if (!req.user) {
       throw new NotFoundException();
@@ -80,11 +84,3 @@ export class AuthController {
     res.redirect(`http://localhost:3001/login/?token=${token}`);
   }
 }
-
-// function querystring(object: { [key: string]: string }) {
-//   let stringData = '?';
-//   Object.keys(object).forEach(
-//     (key) => (stringData += `${key}=${object[key]}&`),
-//   );
-//   return stringData.slice(0, -1);
-// }
