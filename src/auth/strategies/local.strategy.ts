@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
+import {
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common/exceptions';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
+import { Provider } from 'src/user/entities/user.entity';
 import { AuthService } from '../auth.service';
 
 @Injectable()
@@ -16,7 +20,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    const { token } = this.authService.login(user);
-    return token;
+    if (user.provider !== Provider.LOCAL) {
+      throw new UnprocessableEntityException(
+        `${user.provider}을 통해 로그인 하세요.`,
+      );
+    }
+
+    return user;
   }
 }

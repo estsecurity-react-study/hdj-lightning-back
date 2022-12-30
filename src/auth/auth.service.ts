@@ -2,11 +2,12 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { LoginDto } from './dtos/login.dto';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/user/entities/user.entity';
+import { Provider, User } from 'src/user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtTokenPayload } from './interface/token.interface';
 import { Profile } from 'passport-google-oauth20';
@@ -65,21 +66,57 @@ export class AuthService {
     };
   }
 
-  loginGoogle(profile: Profile) {
+  login2(user: User, res: Response) {
+    const payload: JwtTokenPayload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      provider: user.provider,
+    };
+
+    const token = this.jwtService.sign(payload);
+    this.setJwtTokenCookie(res, token);
+    return {
+      token,
+    };
+  }
+
+  async loginGoogle(profile: Profile, res: Response) {
     if (!profile) {
       throw new NotFoundException();
     }
 
-    if (!profile.emails[0].verified) {
+    const profileEmail = profile.emails[0];
+
+    if (!profileEmail.verified) {
       throw new UnauthorizedException('not verified email.');
     }
 
-    // const payload = {
-    //   email: user.emails[0].value,
-    //   username: `${user.name.givenName}${user.name.familyName}`,
-    //   provider: user.provider,
-    // };
+    let user = await this.userService.findOne({
+      where: { email: profileEmail.value },
+    });
 
-    return;
+    if (!user) {
+      user = await this.userService.createUser(
+        {
+          email: profileEmail.value,
+          username: `${profile.name.givenName}${profile.name.familyName}`,
+          password: '',
+        },
+        Provider.GOOGLE,
+      );
+    }
+
+    if (user.provider !== Provider.GOOGLE) {
+      throw new UnprocessableEntityException(
+        `${user.provider}을 통해 로그인 하세요.`,
+      );
+    }
+
+    const { token } = this.login2(user, res);
+
+    // const { token } = this.login(user);
+
+    return { token };
   }
 }

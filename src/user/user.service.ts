@@ -11,18 +11,21 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async findOne(option: FindOneOptions<User>) {
-    try {
-      const user = await this.userRepository.findOne(option);
-      if (!user) {
-        throw new NotFoundException();
-      }
-
-      return user;
-    } catch (error) {
-      throw error;
-    }
+  findOne(option: FindOneOptions<User>) {
+    return this.userRepository.findOne(option);
   }
+  // async findOne(option: FindOneOptions<User>) {
+  //   try {
+  //     const user = await this.userRepository.findOne(option);
+  //     if (!user) {
+  //       throw new NotFoundException();
+  //     }
+
+  //     return user;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   async createUser(
     { email, password, username }: CreateUserDto,
