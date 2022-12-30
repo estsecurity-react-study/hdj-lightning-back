@@ -7,10 +7,7 @@ import {
   UseGuards,
   Body,
 } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common/exceptions/not-found.exception';
-import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import {
   PassportGoogleRequest,
@@ -24,12 +21,12 @@ import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { NaverAuthGuard } from './guards/naver-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly configService: ConfigService,
-    private readonly jwtService: JwtService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
@@ -46,6 +43,7 @@ export class AuthController {
     @Req() req: PassportLocalRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
+    // TODO: localLogin Block
     const token = req.user;
 
     this.authService.setJwtTokenCookie(res, token);
@@ -65,7 +63,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   profile(@Req() req: PassportJwtRequest) {
-    console.log('jwt authorized!', req.user);
     return req.user;
   }
 
@@ -77,26 +74,36 @@ export class AuthController {
 
   @UseGuards(GoogleAuthGuard)
   @Get('/google/callback')
-  googleAuthCallback(@Req() req: PassportGoogleRequest, @Res() res: Response) {
-    console.log('passport data\n', req.user);
-    if (!req.user) {
-      throw new NotFoundException();
-    }
+  async googleAuthCallback(
+    @Req() req: PassportGoogleRequest,
+    @Res() res: Response,
+  ) {
+    const profile = req.user;
+    console.log('google auth!', profile);
 
-    // TODO: 소셜 로그인 이여도 DB에 유저 가공해서 저장.
-    const user = req.user;
+    const { token } = await this.authService.loginGoogle(profile, res);
+    this.authService.setJwtTokenCookie(res, token);
 
-    if (!user.emails[0].verified) {
-      throw new UnauthorizedException('not verified email.');
-    }
+    const url = this.configService.get('FRONTEND_URL');
+    res.redirect(url);
+  }
 
-    const payload = {
-      email: user.emails[0].value,
-      username: `${user.name.givenName}${user.name.familyName}`,
-      provider: user.provider,
-    };
+  @UseGuards(NaverAuthGuard)
+  @Get('/naver/login')
+  loginByNaver() {
+    return null;
+  }
 
-    const token = this.jwtService.sign(payload);
+  @UseGuards(NaverAuthGuard)
+  @Get('/naver/callback')
+  async naverAuthCallback(
+    @Req() req: PassportGoogleRequest,
+    @Res() res: Response,
+  ) {
+    const profile = req.user;
+    console.log('google auth!', profile);
+
+    const { token } = await this.authService.loginGoogle(profile, res);
     this.authService.setJwtTokenCookie(res, token);
 
     const url = this.configService.get('FRONTEND_URL');

@@ -31,4 +31,8 @@ import { UserModule } from './user/user.module';
   ],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log(process.env.JWT_MAX_AGE);
+  }
+}
