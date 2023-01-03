@@ -15,15 +15,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(email: string, password: string) {
-    const user = await this.authService.validateUser({ email, password });
+    const user = await this.authService.loginLocal({ email, password });
     if (!user) {
       throw new UnauthorizedException();
-    }
-
-    if (user.provider !== Provider.local) {
-      throw new UnprocessableEntityException(
-        `${user.provider}을 통해 로그인 하세요.`,
-      );
     }
 
     return user;

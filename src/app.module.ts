@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
+import { OauthModule } from './oauth/oauth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UserModule } from './user/user.module';
     }),
     AuthModule,
     UserModule,
+    OauthModule,
   ],
   providers: [AppService],
 })

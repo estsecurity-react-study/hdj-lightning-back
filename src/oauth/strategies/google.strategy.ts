@@ -3,8 +3,8 @@ import { ForbiddenException } from '@nestjs/common/exceptions';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
+import { SocialProfile } from 'src/oauth/interfaces/oauth-request.interface';
 import { Provider } from 'src/user/entities/user.entity';
-import { SocialProfile } from '../interface/passport-request.interface';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {

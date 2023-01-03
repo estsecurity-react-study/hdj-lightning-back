@@ -7,26 +7,22 @@ import {
   UseGuards,
   Body,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import {
-  PassportJwtRequest,
-  PassportLocalRequest,
-  PassportSocialRequest,
-} from 'src/auth/interface/passport-request.interface';
+
 import { CreateUserDto } from 'src/user/dtos/createUser.dto';
 import { Provider } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { NaverAuthGuard } from './guards/naver-auth.guard';
+import {
+  PassportJwtRequest,
+  PassportLocalRequest,
+} from './interface/login-request.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
@@ -45,6 +41,7 @@ export class AuthController {
   ) {
     // TODO: localLogin Block
     const user = req.user;
+    console.log(`${Provider[user.provider]} auth!`, user);
 
     const { token } = this.authService.login(user, res);
     return token;
@@ -64,41 +61,5 @@ export class AuthController {
   @Get('/me')
   profile(@Req() req: PassportJwtRequest) {
     return req.user;
-  }
-
-  @UseGuards(GoogleAuthGuard)
-  @Get('/google/login')
-  loginByGoogle() {
-    return null;
-  }
-
-  @UseGuards(GoogleAuthGuard)
-  @Get('/google/callback')
-  async googleAuthCallback(
-    @Req() req: PassportSocialRequest,
-    @Res() res: Response,
-  ) {
-    const profile = req.user;
-    console.log(`${Provider[profile.provider]} auth!`, profile);
-
-    await this.authService.loginSocial(profile, res);
-  }
-
-  @UseGuards(NaverAuthGuard)
-  @Get('/naver/login')
-  loginByNaver() {
-    return null;
-  }
-
-  @UseGuards(NaverAuthGuard)
-  @Get('/naver/callback')
-  async naverAuthCallback(
-    @Req() req: PassportSocialRequest,
-    @Res() res: Response,
-  ) {
-    const profile = req.user;
-    console.log(`${Provider[profile.provider]} auth!`, profile);
-
-    await this.authService.loginSocial(profile, res);
   }
 }

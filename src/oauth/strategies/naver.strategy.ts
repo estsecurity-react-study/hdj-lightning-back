@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-naver-v2';
 import { Provider } from 'src/user/entities/user.entity';
-import { SocialProfile } from '../interface/passport-request.interface';
+import { SocialProfile } from '../interfaces/oauth-request.interface';
 
 @Injectable()
 export class NaverStrategy extends PassportStrategy(Strategy) {
