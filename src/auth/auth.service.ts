@@ -13,6 +13,7 @@ import { JwtTokenPayload } from './interface/token.interface';
 import { Profile } from 'passport-google-oauth20';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { SocialProfile } from './interface/passport-request.interface';
 
 @Injectable()
 export class AuthService {
@@ -52,21 +53,7 @@ export class AuthService {
     res.cookie('jwt', '', { httpOnly: true, maxAge: 0 });
   }
 
-  login(user: User) {
-    const payload: JwtTokenPayload = {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      provider: user.provider,
-    };
-
-    const token = this.jwtService.sign(payload);
-    return {
-      token,
-    };
-  }
-
-  login2(user: User, res: Response) {
+  login(user: User, res: Response) {
     const payload: JwtTokenPayload = {
       id: user.id,
       email: user.email,
@@ -81,42 +68,37 @@ export class AuthService {
     };
   }
 
-  async loginGoogle(profile: Profile, res: Response) {
+  async loginSocial(profile: SocialProfile, res: Response) {
     if (!profile) {
       throw new NotFoundException();
     }
 
-    const profileEmail = profile.emails[0];
-
-    if (!profileEmail.verified) {
-      throw new UnauthorizedException('not verified email.');
-    }
+    const { email, username, provider } = profile;
 
     let user = await this.userService.findOne({
-      where: { email: profileEmail.value },
+      where: { email },
     });
 
     if (!user) {
       user = await this.userService.createUser(
         {
-          email: profileEmail.value,
-          username: `${profile.name.givenName}${profile.name.familyName}`,
+          email,
+          username,
           password: '',
         },
-        Provider.GOOGLE,
+        Provider[provider],
       );
     }
 
-    if (user.provider !== Provider.GOOGLE) {
+    if (user.provider !== Provider[provider]) {
       throw new UnprocessableEntityException(
         `${user.provider}을 통해 로그인 하세요.`,
       );
     }
 
-    const { token } = this.login2(user, res);
+    this.login(user, res);
 
-    // const { token } = this.login(user);
-
-    return { token };
+    const url = this.configService.get('FRONTEND_URL');
+    res.redirect(url);
   }
 }

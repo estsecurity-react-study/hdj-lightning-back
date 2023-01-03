@@ -14,10 +14,10 @@ import {
 import * as bcrypt from 'bcrypt';
 
 export enum Provider {
-  LOCAL = 'local',
-  GOOGLE = 'google',
-  NAVER = 'naver',
-  KAKAO = 'kakao',
+  local = 'local',
+  google = 'google',
+  naver = 'naver',
+  kakao = 'kakao',
 }
 
 @Entity()

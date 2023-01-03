@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-naver-v2';
+import { Provider } from 'src/user/entities/user.entity';
+import { SocialProfile } from '../interface/passport-request.interface';
 
 @Injectable()
 export class NaverStrategy extends PassportStrategy(Strategy) {
@@ -13,9 +15,11 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(accessToken, refreshToken, profile: Profile) {
+  validate(accessToken, refreshToken, profile: Profile): SocialProfile {
     console.log(profile);
 
-    return profile;
+    const { email, nickname: username, provider } = profile;
+
+    return { email, username, provider: Provider[provider] };
   }
 }

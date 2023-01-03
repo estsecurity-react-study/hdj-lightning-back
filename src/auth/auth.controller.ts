@@ -10,9 +10,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import {
-  PassportGoogleRequest,
   PassportJwtRequest,
   PassportLocalRequest,
+  PassportSocialRequest,
 } from 'src/auth/interface/passport-request.interface';
 import { CreateUserDto } from 'src/user/dtos/createUser.dto';
 import { Provider } from 'src/user/entities/user.entity';
@@ -34,7 +34,7 @@ export class AuthController {
   @Post('/register')
   regisiter(@Body() createUserDto: CreateUserDto) {
     console.log(createUserDto);
-    return this.userService.createUser(createUserDto, Provider.LOCAL);
+    return this.userService.createUser(createUserDto, Provider.local);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -44,9 +44,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     // TODO: localLogin Block
-    const token = req.user;
+    const user = req.user;
 
-    this.authService.setJwtTokenCookie(res, token);
+    const { token } = this.authService.login(user, res);
     return token;
   }
 
@@ -75,17 +75,13 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('/google/callback')
   async googleAuthCallback(
-    @Req() req: PassportGoogleRequest,
+    @Req() req: PassportSocialRequest,
     @Res() res: Response,
   ) {
     const profile = req.user;
-    console.log('google auth!', profile);
+    console.log(`${Provider[profile.provider]} auth!`, profile);
 
-    const { token } = await this.authService.loginGoogle(profile, res);
-    this.authService.setJwtTokenCookie(res, token);
-
-    const url = this.configService.get('FRONTEND_URL');
-    res.redirect(url);
+    await this.authService.loginSocial(profile, res);
   }
 
   @UseGuards(NaverAuthGuard)
@@ -97,16 +93,12 @@ export class AuthController {
   @UseGuards(NaverAuthGuard)
   @Get('/naver/callback')
   async naverAuthCallback(
-    @Req() req: PassportGoogleRequest,
+    @Req() req: PassportSocialRequest,
     @Res() res: Response,
   ) {
     const profile = req.user;
-    console.log('google auth!', profile);
+    console.log(`${Provider[profile.provider]} auth!`, profile);
 
-    const { token } = await this.authService.loginGoogle(profile, res);
-    this.authService.setJwtTokenCookie(res, token);
-
-    const url = this.configService.get('FRONTEND_URL');
-    res.redirect(url);
+    await this.authService.loginSocial(profile, res);
   }
 }

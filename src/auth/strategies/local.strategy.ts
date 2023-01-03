@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    if (user.provider !== Provider.LOCAL) {
+    if (user.provider !== Provider.local) {
       throw new UnprocessableEntityException(
         `${user.provider}을 통해 로그인 하세요.`,
       );

@@ -1,6 +1,11 @@
 import { Request } from 'express';
-import { Profile } from 'passport-google-oauth20';
-import { User } from 'src/user/entities/user.entity';
+import { Provider, User } from 'src/user/entities/user.entity';
+
+export interface SocialProfile {
+  email: string;
+  username: string;
+  provider: Provider;
+}
 
 export interface PassportRequest<T> extends Request {
   user: T;
@@ -8,6 +13,6 @@ export interface PassportRequest<T> extends Request {
 
 export type PassportJwtRequest = PassportRequest<User>;
 
-export type PassportLocalRequest = PassportRequest<string>;
+export type PassportLocalRequest = PassportRequest<User>;
 
-export type PassportGoogleRequest = PassportRequest<Profile>;
+export type PassportSocialRequest = PassportRequest<SocialProfile>;
