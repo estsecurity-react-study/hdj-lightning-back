@@ -5,6 +5,7 @@ import { GoogleAuthGuard } from 'src/oauth/guards/google-auth.guard';
 import { PassportSocialRequest } from 'src/oauth/interfaces/oauth-request.interface';
 import { Provider } from 'src/user/entities/user.entity';
 import { NaverAuthGuard } from './guards/naver-auth.guard';
+import { KakaoAuthGuard } from './guards/kakao-auth.guard';
 
 @Controller('oauth')
 export class OauthController {
@@ -37,6 +38,24 @@ export class OauthController {
   @UseGuards(NaverAuthGuard)
   @Get('/naver/callback')
   async naverAuthCallback(
+    @Req() req: PassportSocialRequest,
+    @Res() res: Response,
+  ) {
+    const profile = req.user;
+    console.log(`${Provider[profile.provider]} auth!`, profile);
+
+    await this.oauthService.loginSocial(profile, res);
+  }
+
+  @UseGuards(KakaoAuthGuard)
+  @Get('/kakao/login')
+  loginByKakao() {
+    return null;
+  }
+
+  @UseGuards(KakaoAuthGuard)
+  @Get('/kakao/callback')
+  async KakaoAuthCallback(
     @Req() req: PassportSocialRequest,
     @Res() res: Response,
   ) {
