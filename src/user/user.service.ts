@@ -3,6 +3,7 @@ import { ConflictException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
+import { UpdateUserDto } from './dtos/updateUser.dto';
 import { Provider, User } from './entities/user.entity';
 
 @Injectable()
@@ -36,5 +37,10 @@ export class UserService {
     } catch (error) {
       throw error;
     }
+  }
+
+  updateUser(updateUserDto: UpdateUserDto) {
+    // TODO: 로직 추가
+    return;
   }
 }
