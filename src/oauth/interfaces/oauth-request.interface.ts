@@ -5,6 +5,7 @@ export interface SocialProfile {
   email: string;
   username: string;
   provider: Provider;
+  photo: string;
 }
 
 export type PassportSocialRequest = PassportRequest<SocialProfile>;

@@ -24,15 +24,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
   ): SocialProfile {
     try {
       const {
-        _json: { email, email_verified, name: username },
+        _json: { email, email_verified, name: username, picture },
         provider,
       } = profile;
+
+      console.log(`${Provider[provider]}`, profile);
 
       if (!email_verified) {
         throw new ForbiddenException('not verified email');
       }
 
-      return { email, username, provider: Provider[provider] };
+      return { email, username, provider: Provider[provider], photo: picture };
     } catch (error) {
       console.log(error);
     }

@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import {
   Column,
   Entity,
@@ -50,6 +50,11 @@ export class User {
     const HASH_SALT = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, HASH_SALT);
   }
+
+  @Column({ default: '' })
+  @IsString()
+  @IsOptional()
+  photo?: string;
 
   @CreateDateColumn()
   createAt: Date;

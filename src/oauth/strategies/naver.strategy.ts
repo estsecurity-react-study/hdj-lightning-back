@@ -20,6 +20,7 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
 
     const { email, nickname: username, provider } = profile;
 
-    return { email, username, provider: Provider[provider] };
+    // TODO: naver profile image 추가
+    return { email, username, provider: Provider[provider], photo: '' };
   }
 }

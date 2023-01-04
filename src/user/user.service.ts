@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ConflictException } from '@nestjs/common/exceptions';
+import {
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
@@ -17,7 +20,7 @@ export class UserService {
   }
 
   async createUser(
-    { email, password, username }: CreateUserDto,
+    { email, password, username, photo }: CreateUserDto,
     provider: Provider,
   ) {
     // TODO: class validator로 대체
@@ -32,6 +35,7 @@ export class UserService {
         password,
         username,
         provider,
+        photo,
       });
       return this.userRepository.save(newUser);
     } catch (error) {
@@ -39,8 +43,19 @@ export class UserService {
     }
   }
 
-  updateUser(updateUserDto: UpdateUserDto) {
+  async updateUser(user: User, updateUserDto: UpdateUserDto) {
     // TODO: 로직 추가
+    const _user = await this.userRepository.findOne({
+      where: { email: user.email },
+    });
+
+    if (!_user) {
+      throw new NotFoundException();
+    }
+
+    await this.userRepository.save(
+      this.userRepository.create({ ..._user, ...updateUserDto }),
+    );
     return;
   }
 }

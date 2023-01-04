@@ -22,9 +22,10 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
     console.log(profile);
 
     return {
-      email: profile._json.email,
+      email: profile._json.kakao_account.email,
       username: profile.username,
       provider: Provider[profile.provider],
+      photo: profile._json.kakao_account.profile.image,
     };
   }
 }

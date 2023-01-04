@@ -23,7 +23,7 @@ export class OauthService {
       throw new NotFoundException();
     }
 
-    const { email, username, provider } = profile;
+    const { email, username, provider, photo } = profile;
 
     let user = await this.userService.findOne({
       where: { email },
@@ -35,6 +35,7 @@ export class OauthService {
           email,
           username,
           password: '',
+          photo,
         },
         Provider[provider],
       );
