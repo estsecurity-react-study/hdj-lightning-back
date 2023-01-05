@@ -35,6 +35,9 @@
 ## Installation
 
 ```bash
+#db
+docker-compose up -d
+
 $ npm install
 ```
 
