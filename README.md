@@ -35,15 +35,15 @@
 ## Installation
 
 ```bash
-#db
-docker-compose up -d
-
 $ npm install
 ```
 
 ## Running the app
 
 ```bash
+#db
+$ docker-compose up -d
+
 # development
 $ npm run start
 
