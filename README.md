@@ -24,7 +24,7 @@
 
 ## Todo
 - [ ] 로그인 (Passport)
-  - [ ] 로컬
+  - [x] 로컬
   - [ ] 카카오
   - [ ] 네이버
   - [ ] 구글
@@ -41,6 +41,9 @@ $ npm install
 ## Running the app
 
 ```bash
+#db
+$ docker-compose up -d
+
 # development
 $ npm run start
 
