@@ -29,7 +29,7 @@ export class UserController {
     @Req() req: PassportJwtRequest,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.userService.updateUser(req.user, updateProfileDto);
+    return this.userService.updateProfile(req.user, updateProfileDto);
   }
 
   @UseGuards(JwtAuthGuard)

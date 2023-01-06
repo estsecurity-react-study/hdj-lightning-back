@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
+
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UpdateProfileDto } from './dtos/updateProfile.dto';
@@ -45,7 +46,7 @@ export class UserService {
     }
   }
 
-  async updateUser(user: User, updateProfileDto: UpdateProfileDto) {
+  async updateProfile(user: User, updateProfileDto: UpdateProfileDto) {
     // TODO: 로직 추가
     const _user = await this.userRepository.findOne({
       where: { email: user.email },
@@ -55,10 +56,11 @@ export class UserService {
       throw new NotFoundException();
     }
 
-    await this.userRepository.save(
-      this.userRepository.create({ ..._user, ...updateProfileDto }),
-    );
-    return;
+    // TODO: password 이슈 때문에 update 사용했는데, updateAt 반영이 안됌.
+    return await this.userRepository.update(user.id, {
+      ..._user,
+      ...updateProfileDto,
+    });
   }
 
   // TODO: validation controller -> Entity Transform 으로 변경
