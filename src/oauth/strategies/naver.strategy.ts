@@ -18,9 +18,14 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
   validate(accessToken, refreshToken, profile: Profile): SocialProfile {
     console.log(profile);
 
-    const { email, nickname: username, provider } = profile;
+    const {
+      email,
+      nickname: username,
+      provider,
+      profileImage: photo,
+    } = profile;
 
     // TODO: naver profile image 추가
-    return { email, username, provider: Provider[provider], photo: '' };
+    return { email, username, provider: Provider[provider], photo };
   }
 }
