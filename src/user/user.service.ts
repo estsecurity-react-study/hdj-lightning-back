@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { CreateUserDto } from './dtos/createUser.dto';
-import { UpdateUserDto } from './dtos/updateUser.dto';
+import { UpdateProfileDto } from './dtos/updateProfile.dto';
 import { Provider, User } from './entities/user.entity';
 
 @Injectable()
@@ -43,7 +45,7 @@ export class UserService {
     }
   }
 
-  async updateUser(user: User, updateUserDto: UpdateUserDto) {
+  async updateUser(user: User, updateProfileDto: UpdateProfileDto) {
     // TODO: 로직 추가
     const _user = await this.userRepository.findOne({
       where: { email: user.email },
@@ -54,8 +56,29 @@ export class UserService {
     }
 
     await this.userRepository.save(
-      this.userRepository.create({ ..._user, ...updateUserDto }),
+      this.userRepository.create({ ..._user, ...updateProfileDto }),
     );
     return;
+  }
+
+  // TODO: validation controller -> Entity Transform 으로 변경
+  async changePassword(
+    user: User,
+    { password: newPassword }: ChangePasswordDto,
+  ) {
+    const _user = await this.findOne({ where: { email: user.email } });
+
+    if (!_user) {
+      throw new NotFoundException();
+    }
+
+    // TODO: 해당 로직 Entity 단으로 리팩토링
+    if (_user.password === newPassword) {
+      throw new UnprocessableEntityException('패스워드가 동일합니다.');
+    }
+
+    await this.userRepository.save(
+      this.userRepository.create({ ..._user, password: newPassword }),
+    );
   }
 }

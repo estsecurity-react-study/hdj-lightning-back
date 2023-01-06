@@ -62,4 +62,6 @@ export class AuthController {
   profile(@Req() req: PassportJwtRequest) {
     return req.user;
   }
+
+  // TODO: 비밀번호 찾기 로직 추가 (2차 인증 수단 필요)
 }

@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PassportJwtRequest } from 'src/auth/interface/login-request.interface';
-import { UpdateUserDto } from './dtos/updateUser.dto';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
+import { UpdateProfileDto } from './dtos/updateProfile.dto';
 
 import { UserService } from './user.service';
 
@@ -26,8 +27,17 @@ export class UserController {
   @Patch('/profile')
   updateUser(
     @Req() req: PassportJwtRequest,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.userService.updateUser(req.user, updateUserDto);
+    return this.userService.updateUser(req.user, updateProfileDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/profile/password')
+  changePassword(
+    @Req() req: PassportJwtRequest,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(req.user, changePasswordDto);
   }
 }

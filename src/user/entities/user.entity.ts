@@ -36,7 +36,6 @@ export class User {
 
   @Column()
   @IsEnum(Provider)
-  @Exclude()
   provider: Provider;
 
   @Column()
