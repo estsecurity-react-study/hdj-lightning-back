@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 import { OauthModule } from './oauth/oauth.module';
+import { EventsModule } from './events/event.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { OauthModule } from './oauth/oauth.module';
       }),
       inject: [ConfigService],
     }),
+    EventsModule,
     AuthModule,
     UserModule,
     OauthModule,
