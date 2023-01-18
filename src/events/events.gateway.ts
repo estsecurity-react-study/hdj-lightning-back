@@ -13,6 +13,13 @@ export class EventsGateway {
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: string): string {
+    console.log(data);
+    return data;
+  }
+
+  @SubscribeMessage('ping')
+  handlePingPong(@MessageBody() data: string) {
+    console.log('ping! pong!');
     return data;
   }
 }
