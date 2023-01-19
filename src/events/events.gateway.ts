@@ -1,13 +1,27 @@
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'http';
+import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+} from '@nestjs/websockets/interfaces';
+import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway(8080, { transports: ['websocket'] })
-export class EventsGateway {
+@WebSocketGateway({
+  transports: ['websocket'],
+  namespace: 'chat',
+  cors: {
+    origin: ['http://localhost:3000'],
+  },
+})
+export class EventsGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -21,5 +35,28 @@ export class EventsGateway {
   handlePingPong(@MessageBody() data: string) {
     console.log('ping! pong!');
     return data;
+  }
+
+  @SubscribeMessage('clientSend')
+  handleSendChat(@MessageBody() data, @ConnectedSocket() client: Socket) {
+    const res = {
+      text: data.text,
+      sender: client.id,
+      time: client.handshake.time,
+    };
+    console.log(res);
+    this.server.emit('serverSend', res);
+  }
+
+  afterInit(server: Server) {
+    console.log('init!');
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log(`diconnected: ${client.id}`);
+  }
+
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(`connected: ${client.id}`);
   }
 }
