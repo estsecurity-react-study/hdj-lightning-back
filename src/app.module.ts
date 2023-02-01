@@ -7,7 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 import { OauthModule } from './oauth/oauth.module';
-import { EventsModule } from './events/event.module';
+import { ChatModule } from './chat/chat.module';
+import { Message } from './chat/entities/message.entity';
 
 @Module({
   imports: [
@@ -23,15 +24,15 @@ import { EventsModule } from './events/event.module';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User],
+        entities: [User, Message],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
-    EventsModule,
     AuthModule,
     UserModule,
     OauthModule,
+    ChatModule,
   ],
   providers: [AppService],
 })

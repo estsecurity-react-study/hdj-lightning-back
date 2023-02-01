@@ -10,8 +10,10 @@ import {
   BeforeInsert,
   BeforeUpdate,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Message } from 'src/chat/entities/message.entity';
 
 export enum Provider {
   local = 'local',
@@ -54,6 +56,9 @@ export class User {
   @IsString()
   @IsOptional()
   photo?: string;
+
+  @OneToMany(() => Message, (message) => message.user)
+  messages: Message[];
 
   @CreateDateColumn()
   createAt: Date;
