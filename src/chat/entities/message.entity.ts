@@ -7,6 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Room } from './room.entity';
 
 @Entity()
 export class Message {
@@ -19,6 +20,9 @@ export class Message {
 
   @ManyToOne(() => User, (user) => user.messages)
   user: User;
+
+  @ManyToOne(() => Room, (room) => room.messages)
+  room: Room;
 
   @CreateDateColumn()
   createAt: Date;

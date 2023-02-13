@@ -4,5 +4,5 @@ import { MessageDto } from './message.dto';
 
 export class CreateMessageDto extends PartialType(MessageDto) {
   @IsNumber()
-  senderId: number;
+  roomId: number;
 }

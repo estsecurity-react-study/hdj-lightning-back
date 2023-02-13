@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { OauthModule } from './oauth/oauth.module';
 import { ChatModule } from './chat/chat.module';
 import { Message } from './chat/entities/message.entity';
+import { Room } from './chat/entities/room.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { Message } from './chat/entities/message.entity';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User, Message],
+        entities: [User, Room, Message],
         synchronize: true,
       }),
       inject: [ConfigService],

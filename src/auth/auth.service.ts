@@ -71,4 +71,8 @@ export class AuthService {
       throw error;
     }
   }
+
+  validate(token: string) {
+    return this.jwtService.decode(token);
+  }
 }
